@@ -39,10 +39,16 @@ usersRouter.post('/', (req, res) => {
     let validationErrors = null;
     User.findEmail(email)
       .then((existingUser) => {
-        if (existingUser) return Promise.reject('DUPLICATE_EMAIL');
         validationErrors = User.validate(req.body);
-        if (validationErrors) return Promise.reject('INVALID_DATA');
-        return User.create(req.body);
+        if (existingUser) {
+          return Promise.reject('DUPLICATE_EMAIL');
+        }
+        else if (validationErrors) {
+          return Promise.reject('INVALID_DATA');
+        }
+        else {
+          return User.createOne(req.body);
+        }
       })
       .then((createdUser) => {
         res.status(201).json(createdUser);
@@ -96,6 +102,7 @@ usersRouter.delete('/:id', (req, res) => {
         })
     ;
 });
+
 
 
 
